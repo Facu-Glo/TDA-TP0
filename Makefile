@@ -31,5 +31,4 @@ pdf:
 
 clean:
 	@rm -rf $(VENV) $(BUILD_DIR)
-	@rm -rf $(INFORME_DIR)/$(INFORME_TEX:.tex=.pdf)
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
