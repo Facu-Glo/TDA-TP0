@@ -1,4 +1,4 @@
-SCRIPT = amigos_refactorizado.py
+SCRIPT = amigos.py
 GRAFICO = Graficos.graficos
 VENV = venv
 PYTHON = python3

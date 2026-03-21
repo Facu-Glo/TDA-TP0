@@ -6,10 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import time
 import matplotlib.pyplot as plt
 
-from amigos_refactorizado import amigos as amigos
-from amigos_refactorizado import amigos_sin as amigos_nativo
-# from amigos import amigos as amigos_original
-
+from amigos import amigos as amigos
 
 def medir_rendimiento(config_funciones, n_values):
     resultados = {nombre: [] for nombre in config_funciones.keys()}
