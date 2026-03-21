@@ -8,6 +8,10 @@ Este proyecto contiene la implementación y el análisis de algoritmos para la r
 * **Make**
 * **pdfLaTeX**
 
+## Informe
+Podés leer el análisis detallado de complejidad y performance en el siguiente enlace:
+* [Ver Informe Final (PDF)](./Informe/informe.pdf)
+
 ## Instalación y Configuración
 
 El proyecto utiliza un entorno virtual (`venv`) para gestionar las dependencias de forma aislada. Para configurar el entorno e instalar las librerías necesarias (`numpy` y `matplotlib`), ejecutá:
