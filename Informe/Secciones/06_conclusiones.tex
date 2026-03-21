@@ -1,0 +1,12 @@
+\section{Conclusión}
+
+La reingeniería del algoritmo para la búsqueda de números amigos permitió transformar una solución inicial de complejidad cuadrática $O(n^2)$ en una implementación de orden log-lineal $O(n \log n)$. A partir de los resultados obtenidos, se desprenden las siguientes conclusiones:
+
+\begin{itemize}
+    \item \textbf{Impacto de la Complejidad:} El cambio de paradigma, pasando de una búsqueda individual de divisores a un modelo de pre-cálculo basado en la \textit{Criba de Divisores}, es la optimización principal que permitió procesar rangos de gran escala. Como se evidenció en la Figura \ref{fig:comparacion_drastica}, este cambio reduce el tiempo de ejecución de varios minutos a fracciones de segundo, validando la teoría asintótica en un entorno real.
+    
+    \item \textbf{Comportamiento de las Implementaciones:} La comparación entre la versión nativa de Python y la librería NumPy reveló que la eficiencia no depende exclusivamente del algoritmo, sino también del volumen de datos. Se identificó un punto de cruce cerca de los 150.000 elementos donde el beneficio de la vectorización compensa el costo inicial de la librería demostrando que la implementación con NumPy presenta una menor pendiente de crecimiento al procesar millones de registros, lo que permite manejar volúmenes de datos a gran escala con un menor costo de tiempo adicional.
+    
+\end{itemize}
+
+En definitiva, el proyecto demuestra que el análisis de algoritmos es fundamental para convertir procesos computacionalmente inviables en soluciones de alto rendimiento, capaces de procesar millones de datos en pocos segundos.

@@ -1,0 +1,72 @@
+\section{Análisis y Evolución Algorítmica}
+\subsection{Algoritmo original:}
+
+\begin{lstlisting}[language=Python]
+import time
+
+
+def amigos(MAX):
+    t1 = time.time()
+    for i in range(MAX):
+        s = 0
+        for j in range(1, i - 1 + 1):
+            if i % j == 0:
+                s += j
+        s2 = 0
+        for k in range(1, s - 1):
+            if s % k == 0:
+                s2 += k
+        if i == s2:
+            print(i, s)
+
+    t2 = time.time()
+    print(t2 - t1)
+\end{lstlisting}
+
+El algoritmo implementado para la búsqueda de números amigos presenta una estructura de tres bucles que determinan su eficiencia. El parámetro de entrada, que define el límite superior de búsqueda, se denota como $n$ (correspondiente a MAX).
+
+El nivel jerárquico superior es un bucle externo controlado por la variable $i$, el cual posee una complejidad lineal $O(n)$, ya que recorre exactamente todos los números en el rango $[0, n)$. Su función es actuar como pivote para evaluar, uno por uno, si los números del intervalo poseen un ``amigo''.
+
+Sin embargo, la carga computacional total no es simplemente $n$, porque este bucle exterior ordena la ejecución de procesos internos cuya duración depende del valor actual de $i$:
+\begin{itemize}
+	\item Bucle $j$ (Cálculo de $s$): Encargado de calcular la suma de los divisores propios de $i$. Este bucle opera en un rango definido por \texttt{range(1, i)}, lo que implica que realiza aproximadamente $i$ iteraciones.
+	\item Bucle $k$ (Cálculo de $s2$): Obtiene la suma de los divisores del resultado anterior, $s$. Recorre el rango \texttt{range(1, s-1)}. En el análisis asintótico, se considera que $s$ tiene un orden de magnitud comparable al de $i$.
+\end{itemize}
+
+Para hallar la complejidad total del algoritmo, se debe realizar la sumatoria del trabajo interno realizado por cada vuelta del bucle principal.
+\begin{itemize}
+	\item En la iteración 1 del bucle exterior, los internos realizan 1 operación.
+	\item En la iteración 2 del bucle exterior, los internos realizan 2 operaciones.
+	\item En la iteración $n$, los internos realizan $n$ operaciones.
+\end{itemize}
+
+Matemáticamente, el tiempo total $T(n)$ es la suma de una progresión aritmética generada por el bucle exterior:
+$$T(n) = 1 + 2 + 3 + 4 + \dots + n$$
+
+Para resolver esta serie sin sumar cada término individualmente, aplicamos la fórmula de Gauss, que representa el área de trabajo total cubierta por el algoritmo:
+$$T(n) = \frac{n(n+1)}{2} = \frac{1}{2}n^2 + \frac{1}{2}n$$
+
+A partir de esta expresión, se aplica la Notación Big O. Bajo este análisis, se desprecian las constantes multiplicativas y los términos de menor orden ($n$), ya que su influencia se vuelve insignificante frente al término de mayor potencia cuando $n$ tiende a infinito. Por consiguiente, se concluye que la complejidad temporal del algoritmo original es:
+$$\boxed{\textbf{Complejidad} = \bm{O(n^2)}}$$
+
+% -------- Optimizacion --------
+
+\subsection{Optimización por Frontera de Divisibilidad}
+Una primera mejora lógica sobre el algoritmo original consiste en reducir el rango de búsqueda de divisores. Basándose en la propiedad de que los divisores de un número siempre aparecen en parejas (si $d$ es divisor de $n$, entonces $n/d$ también lo es), no es necesario probar todos los números hasta $n$. Basta con buscar hasta la raíz cuadrada del número ($\sqrt{n}$).
+
+Si bien esta técnica reduce el tiempo de ejecución de $O(n^2)$ a $O(n \sqrt{n})$, sigue siendo un enfoque de búsqueda individual: el programa sigue analizando cada número por separado y realizando operaciones de división. Para un rango de un millón, esta mejora sigue siendo insuficiente, lo que obliga a cambiar la estrategia hacia un pre-cálculo masivo.
+
+\subsection{Evolución hacia el Algoritmo de Criba}
+Para superar las limitaciones de la búsqueda individual (incluso con la mejora de $\sqrt{n}$), se optó por un cambio de paradigma basado en la técnica de Criba.
+
+\subsubsection{Criba de Eratóstenes}
+La criba tradicional es un método eficiente para encontrar números primos. Su lógica consiste en recorrer los números y, al encontrar uno, ``tachar'' todos sus múltiplos en una lista, ya que estos no pueden ser primos. Es un proceso de descarte masivo que evita probar divisiones una por una.
+
+\subsubsection{Adaptación para Suma de Divisores}
+El algoritmo propuesto adapta esta idea de ``recorrido por múltiplos'', pero en lugar de tachar números, los utiliza para construir la suma de divisores.
+
+\begin{itemize}
+	\item Ejemplo: Cuando el divisor es 3, el algoritmo salta por las posiciones 6, 9, 12, 15... sumando un 3 en cada una.
+\end{itemize}
+
+Al finalizar el proceso, cada celda de la tabla contiene automáticamente la suma total de sus divisores propios. Esto transforma el problema de uno de división y resto (\%) a uno de saltos y sumas directas, lo que es masivamente más rápido para el hardware.

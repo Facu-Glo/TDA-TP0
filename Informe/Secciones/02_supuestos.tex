@@ -1,0 +1,20 @@
+\section{Supuestos}
+Para el diseño de la solución propuesta, se han identificado los siguientes supuestos, condiciones y limitaciones que fundamentan la reingeniería del algoritmo:
+
+\textbf{Definición de Divisibilidad Propia:} Se asume que para la determinación de números amigos se consideran exclusivamente los divisores propios (aquellos menores al número en cuestión). En consecuencia, cualquier optimización debe garantizar que el número evaluado no se sume a sí mismo, preservando la integridad de la lógica del problema original.
+
+\textbf{Criterio de Filtrado y Unicidad:} Se establece como condición que el algoritmo debe informar
+únicamente pares de números amigos distintos. Por lo tanto, se asume la exclusión de:
+\begin{itemize}
+	\item \textbf{Números Perfectos:} Casos donde la suma de los divisores propios es igual al número original (s=n), dado que no cumplen la condición de ser un "par" de amigos.
+	\item \textbf{Redundancia por Simetría:} Se asume que cada par (n,s) debe ser informado una sola vez.
+\end{itemize}
+
+\textbf{Límite de Búsqueda de Divisores:} Basado en propiedades de la teoría de números, se establece como premisa que los divisores de un número siempre aparecen de a pares. Por ejemplo, si un número $d$ divide a $n$, entonces el resultado de esa división $n/d$ también es un divisor. Esto permite asumir que es innecesario buscar divisores más allá de la raíz cuadrada del número ($\sqrt{n}$) en métodos de búsqueda individual, ya que todos los divisores mayores a ese límite ya habrían sido ``descubiertos'' como parejas de los divisores más chicos.
+
+\textbf{Criterio de Eficiencia por Distribución:} Se asume que es mucho más rápido para la computadora ``repartir'' un divisor entre todos sus múltiplos de una sola vez, en lugar de ir número por número preguntando quiénes son sus divisores. Al funcionar como un ``repartidor'' que salta por una lista entregando valores, el programa evita hacer millones de cuentas de división, las cuales son mucho más pesadas y lentas para el procesador que una simple suma.
+
+\textbf{Compromiso Espacio-Tiempo:} Se opta por una arquitectura que prioriza la velocidad de ejecución sobre el ahorro de memoria. Para esto, se asume la disponibilidad de recursos suficientes para mantener un arreglo de datos de tamaño n (proporcional al rango de búsqueda). Esta inversión de memoria permite almacenar resultados parciales y reutilizarlos, eliminando la necesidad de repetir cálculos idénticos para cada número, con el objetivo de mejorar la eficiencia general frente al algoritmo original.
+
+\textbf{Compatibilidad de Interfaz:} Se asume que la mejora debe ser funcionalmente compatible con el sistema original, manteniendo el nombre de la función \texttt{amigos(MAX)} y sus parámetros de entrada. Esto garantiza que el usuario perciba la optimización de rendimiento sin necesidad de modificar la forma en que invoca el programa.
+
