@@ -21,7 +21,7 @@ make install
 ```
 Este comando:
 
-- Crea la carpeta `venv/`.
+- Crea la carpeta `.venv/`.
 - Actualiza `pip`.
 - Instala `numpy` y `matplotlib`.
 
@@ -29,7 +29,7 @@ Este comando:
 ```bash
 make run
 ```
-Ejecuta la lógica principal en `amigos.py` (código optimizado)
+Ejecuta la lógica principal en `TP0_López_110736.py` (código optimizado)
 
 ```bash
 make graphics
@@ -43,4 +43,4 @@ Compila el informe LaTeX
 ```bash
 make clean
 ```
-Borra el venv, la carpeta build del informe y los archivos __pycache__.
+Borra el .venv, la carpeta build del informe y los archivos __pycache__.
