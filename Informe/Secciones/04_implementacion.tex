@@ -4,13 +4,17 @@ Una vez definido el cambio de paradigma hacia un modelo de pre-cálculo, se proc
 \subsection{Versión en Python Nativo}
 Esta primera implementación traduce la lógica de la criba de sumas utilizando las estructuras de datos estándar del lenguaje. La clave de su rendimiento reside en el uso del tercer parámetro de la función $range$, que permite iterar únicamente sobre los múltiplos de cada divisor.
 
+Asimismo, se incorporó una lógica de filtrado en la etapa de verificación para garantizar la validez de los resultados y optimizar la salida.
+
 \begin{lstlisting}[language=Python]
 def amigos(MAX):
     t1 = time.time()
 
-    # Inicializacion: El 0 no tiene divisores (0).
-    # Se precarga 1 para el resto (divisor universal).
-    suma_divisores = [0] + [1] * MAX
+    # Inicializacion:
+    # - El 0 no tiene divisores (0).
+    # - El 1 no divisores propios
+    # - Del 2 en adelante, se precarga 1 (el divisor universal propio).
+    suma_divisores = [0, 0] + [1] * (MAX - 1)
 
     # Criba de divisores: Reparto de cada 'divisor' entre sus multiplos
     for divisor in range(2, MAX // 2 + 1):
@@ -18,48 +22,58 @@ def amigos(MAX):
         for multiplo in range(divisor * 2, MAX + 1, divisor):
             suma_divisores[multiplo] += divisor
 
-    # Verificacion de pares: Identifica perfectos y pares simetricos
+    # Verificacion de pares: Identifica pares amigos
     for numero in range(MAX + 1):
         posible_amigo = suma_divisores[numero]
-        
-        # Validacion de reciprocidad: 
-        # Si la suma de divisores del 'posible_amigo' es igual al
-        #'numero' original.
-        if posible_amigo <= MAX and suma_divisores[posible_amigo] == numero:
+
+        # Validacion de reciprocidad:
+        # 1. posible_amigo <= MAX: Evita IndexError si la suma 
+        #    excede el limite.
+        # 2. numero < posible_amigo: Evita duplicados y excluye
+        #    numeros perfectos.
+        # 3. suma_divisores[posible_amigo] == numero: Confirma 
+        #    la amistad.
+        if (
+            posible_amigo <= MAX
+            and numero < posible_amigo
+            and suma_divisores[posible_amigo] == numero
+        ):
             print(numero, posible_amigo)
 
     print(time.time() - t1)
 \end{lstlisting}
 
+Como se observa en la validación de reciprocidad, la condición $\text{numero} < \text{posible\_amigo}$ cumple una doble función: por un lado, descarta los \textbf{números perfectos} (donde la suma es igual al número) y, por otro, actúa como un sistema de \textbf{control de duplicados}. Al exigir una relación de orden, el algoritmo solo informa el par cuando encuentra al menor de los dos componentes, evitando procesar y mostrar la relación inversa (ej. detecta $(220, 284)$ pero ignora el caso cuando el iterador llega a $284$).
+
 A diferencia del modelo original, donde el trabajo dependía de evaluar cada número individualmente ($n \times n$), la eficiencia de la criba reside en que el número de operaciones disminuye drásticamente a medida que el divisor aumenta. El análisis se divide en las tres etapas del código:
 
 \begin{itemize}
-    \item \textbf{Inicialización de la Estructura:}
-    La instrucción \colorbox{gray!10}{\texttt{[0, 0] + [1] * (MAX - 1)}} crea una lista de tamaño $n$ en un solo paso de memoria. Esta operación tiene una complejidad lineal:
-    \[ T_{init}(n) = O(n) \]
+	\item \textbf{Inicialización de la Estructura:}
+	      La instrucción \colorbox{gray!10}{\texttt{[0, 0] + [1] * (MAX - 1)}} crea una lista de tamaño $n$ en un solo paso de memoria. Esta operación tiene una complejidad lineal:
+	      \[ T_{init}(n) = O(n) \]
 
-    \item \textbf{Cuerpo del Algoritmo (Reparto de Divisores):}
-    Esta es la parte central. El bucle externo recorre los divisores $d$ desde $2$ hasta $n/2$. Por cada divisor, el bucle interno realiza una cantidad de sumas igual a la cantidad de múltiplos de $d$ que entran en el rango MAX.
-    \begin{itemize}
-        \item Para $d=2$, se realizan $n/2$ operaciones.
-        \item Para $d=3$, se realizan $n/3$ operaciones.
-        \item Para $d=4$, se realizan $n/4$ operaciones.
-        \item ... hasta $d=n/2$, donde se realizan $2$ operaciones.
-    \end{itemize}
-    La suma total de operaciones es:
-    \[ 
-    T(n) = n \times \left( \frac{1}{2} + \frac{1}{3} + \frac{1}{4} + \dots + \frac{1}{n/2} \right) 
-    \]
-    Esta expresión representa una variante de la \textbf{Serie Armónica}. Según el análisis de sumatorias presentado por \textbf{Cormen et al. (2022)}, la suma de los recíprocos de los primeros n términos se comporta de forma logarítmica:
-    \[ \sum_{k=1}^{n} \frac{1}{k} \approx \ln n + \gamma \]
-    Por lo tanto, la complejidad dominante de esta etapa, y por extensión del algoritmo completo, es:
-    \[
-    T_{criba}(n) = O(n \log n)
-    \]
+	\item \textbf{Cuerpo del Algoritmo (Reparto de Divisores):}
+	      Esta es la parte central. El bucle externo recorre los divisores \texttt{divisor} desde $2$ hasta \texttt{MAX/2}. Por cada divisor, el bucle interno realiza una cantidad de sumas igual a la cantidad de múltiplos de \texttt{divisor} que entran en el rango MAX.
+	      \begin{itemize}
+		      \item Para \texttt{divisor} = 2, se realizan $n/2$ operaciones.
+		      \item Para \texttt{divisor} = 3, se realizan $n/3$ operaciones.
+		      \item Para \texttt{divisor} = 4, se realizan $n/4$ operaciones.
+		      \item ... hasta \texttt{MAX/2}, donde se realizan $2$ operaciones.
+	      \end{itemize}
+	      La suma total de operaciones es:
+	      \[
+		      T(n) = n \times \left( \frac{1}{2} + \frac{1}{3} + \frac{1}{4} + \dots + \frac{1}{n/2} \right)
+	      \]
+	      Esta expresión representa una variante de la \textbf{Serie Armónica}. Según el análisis de sumatorias presentado por \textbf{Cormen et al. (2022)}, la suma de los recíprocos de los primeros n términos se comporta de forma logarítmica:
+	      \[ \sum_{k=1}^{n} \frac{1}{k} \approx \ln n + \gamma \]
+	      Por lo tanto, la complejidad dominante de esta etapa, y por extensión del algoritmo completo, es:
+	      \[
+		      T_{criba}(n) = O(n \log n)
+	      \]
 
-    \item \textbf{Verificación de Pares:}
-    El último bucle recorre la lista de sumas ya calculada una sola vez para comparar los valores y encontrar las reciprocidades. Al ser un recorrido simple:
-    \[ T_{verif}(n) = O(n) \]
+	\item \textbf{Verificación de Pares:}
+	      El último bucle recorre la lista de sumas ya calculada una sola vez para comparar los valores y encontrar las reciprocidades. Al ser un recorrido simple:
+	      \[ T_{verif}(n) = O(n) \]
 \end{itemize}
 
 \textbf{Complejidad Final:} Sumando las etapas y despreciando los términos de menor orden, se concluye que la complejidad total del algoritmo optimizado es:
@@ -98,19 +112,15 @@ def amigos(MAX):
 \end{lstlisting}
 
 \begin{itemize}
-    \item \textbf{Slicing Vectorizado:} La instrucción \colorbox{gray!10}{\lstinline[language=Python]|tabla_sumas[divisor * 2 :: divisor] += divisor|} elimina el overhead del bucle \texttt{for} de Python. NumPy delega la iteración a rutinas pre-compiladas en C, que acceden directamente a bloques de memoria contiguos y realizan las sumas en paralelo mediante instrucciones \textbf{SIMD} (Single Instruction, Multiple Data).
-    
-    \item \textbf{Indexación Booleana:} En lugar de recorrer los $n$ elementos buscando candidatos
-    con un \texttt{if} tradicional, se utiliza la expresión: \\
-    \colorbox{gray!10}{\lstinline[language=Python]|(tabla_sumas > numeros) & (tabla_sumas <=
-    MAX)|}.\\
-    Esto crea una ``máscara'' de bits que filtra el arreglo completo a nivel de hardware, reduciendo drásticamente la cantidad de comparaciones que el intérprete de Python debe procesar.
-    
-    \item \textbf{Filtrado Lógico de Resultados:} Mediante la condición \colorbox{gray!10}{\lstinline[language=Python]|tabla_sumas < numeros|}, el algoritmo realiza dos limpiezas críticas en un solo paso:
-        \begin{itemize}
-            \item \textbf{Eliminación de Perfectos:} Al exigir que la suma sea menor (o distinta) al número ($s < n$), se excluyen casos como el 6 o el 28, donde $s = n$.
-            \item \textbf{Garantía de Unicidad:} Al procesar solo los casos donde el ``amigo'' es menor al número actual, se evita informar el mismo par dos veces (ej. muestra $[220, 284]$ pero no $[284, 220]$), reduciendo la redundancia en la salida final.
-        \end{itemize}
+	\item \textbf{Slicing Vectorizado:} La instrucción \colorbox{gray!10}{\lstinline[language=Python]|tabla_sumas[divisor * 2 :: divisor] += divisor|} elimina el overhead del bucle \texttt{for} de Python. NumPy delega la iteración a rutinas pre-compiladas en C, que acceden directamente a bloques de memoria contiguos y realizan las sumas en paralelo mediante instrucciones \textbf{SIMD} (Single Instruction, Multiple Data).
+
+	\item \textbf{Indexación Booleana:} En lugar de recorrer los $n$ elementos buscando candidatos con un \texttt{if} tradicional, se utiliza la expresión: \\
+	      \colorbox{gray!10}{\lstinline[language=Python]|(tabla_sumas > numeros) & (tabla_sumas <= MAX)|}.\\
+	      Esta operación genera una "máscara" que filtra el arreglo a nivel de hardware, permitiendo que:
+	      \begin{itemize}
+		      \item Se optimice el procesamiento: El intérprete de Python solo recibe los índices con alta probabilidad de éxito, reduciendo drásticamente las comparaciones costosas.
+		      \item Filtrado de casos triviales: Al exigir que los valores en \texttt{tabla\_sumas} sean mayores a los de \texttt{numeros}, se descartan automáticamente los números perfectos (donde la suma es igual al número) y se garantiza la unicidad de los pares.
+          \end{itemize}
 \end{itemize}
 
 \textbf{Nota sobre la complejidad:} Aunque el uso de NumPy no cambia la complejidad asintótica teórica ($O(n \log n)$), la constante de tiempo se reduce de forma tan significativa que permite procesar en milisegundos lo que a Python nativo le tomaría segundos.
