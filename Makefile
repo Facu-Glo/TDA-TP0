@@ -1,6 +1,6 @@
-SCRIPT = amigos.py
+SCRIPT = TP0_López_110736.py
 GRAFICO = Graficos.graficos
-VENV = venv
+VENV = .venv
 PYTHON = python3
 BIN = $(VENV)/bin/python
 LIBRERIAS = numpy matplotlib
